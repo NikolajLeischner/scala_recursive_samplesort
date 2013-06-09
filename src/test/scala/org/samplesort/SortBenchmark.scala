@@ -5,8 +5,8 @@ import collection.mutable.ArrayBuffer
 
 object SortBenchmark
 extends PerformanceTest.Quickbenchmark {
-  val sizes = Gen.exponential("size")(2 << 12, 2 << 19, 2)
-  var r = new scala.util.Random
+  val sizes = Gen.exponential("size")(2 << 12, 2 << 15, 2)
+  val r = new scala.util.Random
   
   val iterations = for {
     size <- sizes 

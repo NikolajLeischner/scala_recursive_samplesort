@@ -19,3 +19,10 @@ libraryDependencies += "org.jmock" % "jmock-legacy" % "2.6.0" % "test"
 libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.0.M5b" % "test"
 
 resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
+
+resolvers += "Sonatype OSS Snapshots" at
+  "https://oss.sonatype.org/content/repositories/snapshots"
+
+libraryDependencies += "com.github.axel22" %% "scalameter" % "0.3"
+
+testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
