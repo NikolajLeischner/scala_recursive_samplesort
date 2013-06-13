@@ -5,7 +5,7 @@ import collection.mutable.ArrayBuffer
 
 object SortBenchmark
 extends PerformanceTest.Quickbenchmark {
-  val sizes = Gen.exponential("size")(2 << 12, 2 << 15, 2)
+  val sizes = Gen.exponential("size")(2 << 12, 2 << 19, 2)
   val r = new scala.util.Random
   
   val iterations = for {
@@ -22,12 +22,20 @@ extends PerformanceTest.Quickbenchmark {
 
   val arrays = for {
     size <- sizes
-  } yield ArrayBuffer.fill(size)(r.nextInt)
+  } yield Array.fill(size)(r.nextInt)
 
   performance of "Sort" in {
     measure method "sort" in {
       using(arrays) in {
         a => a.sorted
+      }
+    }
+  }
+
+  performance of "SampleSort" in {
+    measure method "sort" in {
+      using(arrays) in {
+        a => samplesort.SampleSort.sort(a)
       }
     }
   }
