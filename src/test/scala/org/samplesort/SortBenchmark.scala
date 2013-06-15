@@ -1,11 +1,10 @@
 package org.samplesort
 
 import org.scalameter.api._
-import collection.mutable.ArrayBuffer
 
 object SortBenchmark
 extends PerformanceTest.Quickbenchmark {
-  val sizes = Gen.exponential("size")(2 << 12, 2 << 19, 2)
+  val sizes = Gen.exponential("size")(2 << 8, 2 << 18, 2)
   val r = new scala.util.Random
   
   val iterations = for {
@@ -15,7 +14,7 @@ extends PerformanceTest.Quickbenchmark {
   performance of "RNG" in {
     measure method "nextInt" in {
       using(iterations) in {
-        i => for (count <- Range(0, i)) r.nextInt
+        i => for (count <- Range(0, i)) (r.nextInt >> 10)
       }
     }
   }
