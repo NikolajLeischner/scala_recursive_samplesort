@@ -9,7 +9,7 @@ extends PerformanceTest.Quickbenchmark {
 
   val arrays = for {
     size <- sizes
-  } yield Array.fill(size)(r.nextInt)
+  } yield Array.fill(size)(r.nextInt())
 
   performance of "Sort" in {
     measure method "sort" in {

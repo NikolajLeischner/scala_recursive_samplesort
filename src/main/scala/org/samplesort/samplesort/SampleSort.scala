@@ -1,15 +1,16 @@
 package org.samplesort.samplesort
 
 import scala.math.Ordered._
+import scala.reflect.ClassTag
 
 object SampleSort {
 
-  def sort[A: ClassManifest](input: Array[A])(implicit ord: math.Ordering[A]): Array[A] = {
+  def sort[A: ClassTag](input: Array[A])(implicit ord: math.Ordering[A]): Array[A] = {
     val minimumSizeForDistribution = 2 << 14
     if (input.length < minimumSizeForDistribution) {
-      return input.sorted(ord)
+      input.sorted(ord)
     } else if (input.distinct.length == 1) {
-      return input
+      input
     } else {
       val overSamplingFactor = 8
       val searchTreeSize = 128
@@ -18,15 +19,14 @@ object SampleSort {
 
       val chunks = distributeToChunks(input, searchTree)
       val sortedChunks = for (chunk <- chunks) yield sort(chunk)
-      return sortedChunks.flatten
+      sortedChunks.flatten
     }
   }
 
-  def getRandomSample[A](input: Array[A], sampleSize: Int): IndexedSeq[A] = {
+  def getRandomSample[A](input: Array[A], sampleSize: Int): IndexedSeq[A] =
     for (i <- 0 until sampleSize) yield input(random.nextInt(input.length))
-  }
 
-  def buildSearchTree[A: ClassManifest](input: IndexedSeq[A], treeSize: Int, oversamplingFactor: Int)(implicit ord: math.Ordering[A]): IndexedSeq[A] = {
+  def buildSearchTree[A: ClassTag](input: IndexedSeq[A], treeSize: Int, oversamplingFactor: Int)(implicit ord: math.Ordering[A]): IndexedSeq[A] = {
     val sortedSample = input.sorted
     for (i <- 0 until treeSize) yield {
       val l = log2(i + 1)
@@ -35,7 +35,7 @@ object SampleSort {
     }
   }
 
-  def buildChunkArrays[A: ClassManifest](input: Array[A], searchTree: IndexedSeq[A])(implicit ord: math.Ordering[A]): Array[Array[A]] = {
+  def buildChunkArrays[A: ClassTag](input: Array[A], searchTree: IndexedSeq[A])(implicit ord: math.Ordering[A]): Array[Array[A]] = {
     val chunkSizes = Array.fill(searchTree.length)(0)
     for (value <- input) {
       val pos = chunkIndexFromSearchTree(value, searchTree)
@@ -44,7 +44,7 @@ object SampleSort {
     for (size <- chunkSizes) yield new Array[A](size)
   }
 
-  def distributeToChunks[A: ClassManifest](input: Array[A], searchTree: IndexedSeq[A])(implicit ord: math.Ordering[A]): Array[Array[A]] = {
+  def distributeToChunks[A: ClassTag](input: Array[A], searchTree: IndexedSeq[A])(implicit ord: math.Ordering[A]): Array[Array[A]] = {
     val chunks = buildChunkArrays(input, searchTree)
 
     val offsets = Array.fill(searchTree.length)(0)
@@ -53,10 +53,10 @@ object SampleSort {
       chunks(pos)(offsets(pos)) = value
       offsets(pos) = offsets(pos) + 1
     }
-    return chunks
+    chunks
   }
 
-  def chunkIndexFromSearchTree[A: ClassManifest](element: A, searchTree: IndexedSeq[A])(implicit ord: math.Ordering[A]): Int = {
+  def chunkIndexFromSearchTree[A: ClassTag](element: A, searchTree: IndexedSeq[A])(implicit ord: math.Ordering[A]): Int = {
     var chunkIndex = 1
     for (i <- 0 until log2(searchTree.length)) {
       if (searchTree(chunkIndex - 1) < element) {
@@ -65,8 +65,7 @@ object SampleSort {
         chunkIndex = chunkIndex * 2
       }
     }
-    chunkIndex = chunkIndex - searchTree.length
-    return chunkIndex
+    chunkIndex - searchTree.length
   }
 
   private val random = new scala.util.Random
